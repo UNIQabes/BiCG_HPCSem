@@ -4,7 +4,7 @@
 using namespace std;
 
 #define N 10
-#define GAMMA 0.1
+#define GAMMA 1
 
 vector<double> vec_numtimes(double num, vector<double> vec)
 {
@@ -154,7 +154,7 @@ int main()
 
 		r_k = r_k1;
 		counter++;
-		if (counter % 10000 == 0)
+		if (counter % 1 == 0)
 		{
 			printf("%d:", counter);
 			for (int r = 0; r < N; r++)
