@@ -6,6 +6,30 @@ using namespace std;
 #define N 10
 #define GAMMA 1
 
+// CRS形式の行列
+struct CRSMat
+{
+	int rowNum;
+	int colNum;
+	vector<double> val;
+	vector<int> column_index;
+	vector<int> rowTop_ind;
+
+	CRSMat(int rowNum,
+		   int colNum,
+		   vector<double> val,
+		   vector<int> column_index,
+		   vector<int> rowTop_ind) : rowNum(rowNum), colNum(colNum), val(val), column_index(column_index), rowTop_ind(rowTop_ind)
+	{
+		// もし行数または、データ数に不整合があった場合
+		if (rowTop_ind.size() != rowNum || val.size() != column_index.size())
+		{
+			// エラー落ちする
+			exit(1);
+		}
+	}
+};
+
 vector<double> vec_numtimes(double num, vector<double> vec)
 {
 	int vecSize = vec.size();
@@ -57,6 +81,24 @@ vector<double> MatvecProduct(vector<double> val_CRS, vector<int> col_ind_CRS, ve
 		for (int crs_ind = startCRSindex; crs_ind < nextCRSindex; crs_ind++)
 		{
 			retValue[r] += val_CRS[crs_ind] * vec[col_ind_CRS[crs_ind]];
+		}
+	}
+	return retValue;
+}
+
+vector<double> MatvecProduct(CRSMat mat, vector<double> vec)
+{
+	int valNum = mat.val.size();
+	int rowNum = mat.rowNum;
+	int colNum = mat.colNum;
+	vector<double> retValue(colNum, 0);
+	for (int r = 0; r < N; r++)
+	{
+		int startCRSindex = mat.rowTop_ind[r];
+		int nextCRSindex = r == N - 1 ? mat.val.size() : mat.rowTop_ind[r + 1];
+		for (int crs_ind = startCRSindex; crs_ind < nextCRSindex; crs_ind++)
+		{
+			retValue[r] += mat.val[crs_ind] * vec[mat.column_index[crs_ind]];
 		}
 	}
 	return retValue;
@@ -123,14 +165,20 @@ int main()
 		}
 		printf("\n");
 	}
+	CRSMat A_CRS(N, N, val_CRS, col_ind_CRS, row_ptr_CRS);
 
 	vector<double> initialX(N, 0);
 	vector<double> vecFilled1(N, 1);
-	vector<double> b = MatvecProduct(val_CRS, col_ind_CRS, row_ptr_CRS, vecFilled1);
+	// vector<double> b = MatvecProduct(val_CRS, col_ind_CRS, row_ptr_CRS, vecFilled1);
+	vector<double> b = MatvecProduct(A_CRS, vecFilled1);
 
 	vector<double> x_k = initialX;
-	vector<double> r_k = VecAddition(b, MatvecProduct(val_CRS, col_ind_CRS, row_ptr_CRS, x_k)); // xの初期値が0ベクトルなので、bでも良い
+	// vector<double> r_k = VecAddition(b, MatvecProduct(val_CRS, col_ind_CRS, row_ptr_CRS, x_k)); // xの初期値が0ベクトルなので、bでも良い
+	vector<double> r_k = VecAddition(b, MatvecProduct(A_CRS, x_k)); // xの初期値が0ベクトルなので、bでも良い
+
+	vector<double> rstar_k;
 	vector<double> p_k = r_k;
+	vector<double> pstar_k;
 
 	/*
 	for (int r = 0; r < N; r++)
@@ -143,7 +191,9 @@ int main()
 	int counter = 0;
 	while (vec_norm(r_k) / vec_norm(b) >= 1e-12)
 	{
-		vector<double> q_k = MatvecProduct(val_CRS, col_ind_CRS, row_ptr_CRS, p_k);
+		// vector<double> q_k = MatvecProduct(val_CRS, col_ind_CRS, row_ptr_CRS, p_k);
+		vector<double> q_k = MatvecProduct(A_CRS, p_k);
+		vector<double> qstar_k;
 		double alpha_k = vecDot(r_k, r_k) / vecDot(p_k, q_k);
 
 		x_k = VecAddition(x_k, vec_numtimes(alpha_k, p_k));
