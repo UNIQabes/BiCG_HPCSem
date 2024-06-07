@@ -4,7 +4,7 @@
 using namespace std;
 
 #define N 10
-#define GAMMA 1
+#define GAMMA 0.5
 
 // CRS形式の行列
 struct CRSMat
@@ -68,24 +68,6 @@ vector<double> VecAddition(vector<double> v1, vector<double> v2)
 	return retValue;
 }
 
-vector<double> MatvecProduct(vector<double> val_CRS, vector<int> col_ind_CRS, vector<int> row_ptr_CRS, vector<double> vec)
-{
-	int valNum = val_CRS.size();
-	int rowNum = row_ptr_CRS.size();
-	int colNum = vec.size();
-	vector<double> retValue(colNum, 0);
-	for (int r = 0; r < N; r++)
-	{
-		int startCRSindex = row_ptr_CRS[r];
-		int nextCRSindex = r == N - 1 ? val_CRS.size() : row_ptr_CRS[r + 1];
-		for (int crs_ind = startCRSindex; crs_ind < nextCRSindex; crs_ind++)
-		{
-			retValue[r] += val_CRS[crs_ind] * vec[col_ind_CRS[crs_ind]];
-		}
-	}
-	return retValue;
-}
-
 vector<double> MatvecProduct(CRSMat mat, vector<double> vec)
 {
 	int valNum = mat.val.size();
@@ -99,6 +81,26 @@ vector<double> MatvecProduct(CRSMat mat, vector<double> vec)
 		for (int crs_ind = startCRSindex; crs_ind < nextCRSindex; crs_ind++)
 		{
 			retValue[r] += mat.val[crs_ind] * vec[mat.column_index[crs_ind]];
+		}
+	}
+	return retValue;
+}
+
+vector<double> TransMatvecProduct(CRSMat TransMat, vector<double> vec)
+{
+	int valNum = TransMat.val.size();
+	int rowNum = TransMat.colNum;
+	int colNum = TransMat.rowNum;
+	vector<double> retValue(colNum, 0);
+	for (int c = 0; c < N; c++)
+	{
+		int startCRSindex = TransMat.rowTop_ind[c];
+		int nextCRSindex = c == N - 1 ? TransMat.val.size() : TransMat.rowTop_ind[c + 1];
+		for (int crs_ind = startCRSindex; crs_ind < nextCRSindex; crs_ind++)
+		{
+			int r = TransMat.column_index[crs_ind];
+			int TransMatVal_rc = TransMat.val[crs_ind];
+			retValue[r] += TransMatVal_rc * vec[c];
 		}
 	}
 	return retValue;
@@ -169,40 +171,33 @@ int main()
 
 	vector<double> initialX(N, 0);
 	vector<double> vecFilled1(N, 1);
-	// vector<double> b = MatvecProduct(val_CRS, col_ind_CRS, row_ptr_CRS, vecFilled1);
 	vector<double> b = MatvecProduct(A_CRS, vecFilled1);
 
 	vector<double> x_k = initialX;
-	// vector<double> r_k = VecAddition(b, MatvecProduct(val_CRS, col_ind_CRS, row_ptr_CRS, x_k)); // xの初期値が0ベクトルなので、bでも良い
 	vector<double> r_k = VecAddition(b, MatvecProduct(A_CRS, x_k)); // xの初期値が0ベクトルなので、bでも良い
-
-	vector<double> rstar_k;
+	vector<double> rstar_k = vecFilled1;
 	vector<double> p_k = r_k;
-	vector<double> pstar_k;
-
-	/*
-	for (int r = 0; r < N; r++)
-	{
-		printf(" %lf ", r_k[r]);
-	}
-	printf("\n");
-	*/
+	vector<double> pstar_k = rstar_k;
 
 	int counter = 0;
 	while (vec_norm(r_k) / vec_norm(b) >= 1e-12)
 	{
-		// vector<double> q_k = MatvecProduct(val_CRS, col_ind_CRS, row_ptr_CRS, p_k);
 		vector<double> q_k = MatvecProduct(A_CRS, p_k);
-		vector<double> qstar_k;
-		double alpha_k = vecDot(r_k, r_k) / vecDot(p_k, q_k);
+		vector<double> qstar_k = TransMatvecProduct(A_CRS, pstar_k);
+
+		double alpha_k = vecDot(rstar_k, r_k) / vecDot(pstar_k, q_k);
 
 		x_k = VecAddition(x_k, vec_numtimes(alpha_k, p_k));
 
 		vector<double> r_k1 = VecAddition(r_k, vec_numtimes(-alpha_k, q_k));
-		double beta_k = vecDot(r_k1, r_k1) / vecDot(r_k, r_k);
+		vector<double> rstar_k1 = VecAddition(rstar_k, vec_numtimes(-alpha_k, qstar_k));
+		double beta_k = vecDot(rstar_k1, r_k1) / vecDot(rstar_k, r_k);
 		p_k = VecAddition(r_k1, vec_numtimes(beta_k, p_k));
+		pstar_k = VecAddition(rstar_k1, vec_numtimes(beta_k, pstar_k));
 
 		r_k = r_k1;
+		rstar_k = rstar_k1;
+
 		counter++;
 		if (counter % 1 == 0)
 		{
