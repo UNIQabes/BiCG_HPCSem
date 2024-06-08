@@ -206,40 +206,12 @@ int main()
 	int counter = 0;
 	while (counter < ITERLIMIT && vec_norm(r_k) / vec_norm(b) >= 1e-12)
 	{
-		printf("|r|/|b|:%.15lf\n", vec_norm(r_k) / vec_norm(b));
+		printf("\"%d\", \"%.15lf\"\n", counter, vec_norm(r_k) / vec_norm(b));
 
 		vector<double> q_k = MatvecProduct(A_CRS, p_k);
-		/*
-		printf("b:");
-		for (int i = 0; i < 5; i++)
-		{
-			printf("%lf ", b[i]);
-		}
-		printf("\n");
-		*/
-
-		/*
-		printf("pstar_k:");
-		for (int i = 0; i < 5; i++)
-		{
-			printf("%lf ", pstar_k[i]);
-		}
-		printf("\n");
-		*/
-
-		/*
-		printf("qstar_k:");
-		for (int i = 0; i < 5; i++)
-		{
-			printf("%lf ", qstar_k[i]);
-		}
-		printf("\n");
-		*/
-
-		// printVector("qk", q_k);
 
 		double alpha_k = vecDot(rstar_0, r_k) / vecDot(rstar_0, q_k);
-		printf("alpha:%lf\n", alpha_k);
+		// printf("alpha:%lf\n", alpha_k);
 
 		vector<double> t_k = VecAddition(r_k, vec_numtimes(-alpha_k, q_k));
 		vector<double> s_k = MatvecProduct(A_CRS, t_k);
@@ -249,42 +221,14 @@ int main()
 
 		vector<double> r_k1 = VecAddition(t_k, vec_numtimes(-zeta_k, s_k));
 
-		/*
-		printf("rstar_k1:");
-		for (int i = 0; i < 5; i++)
-		{
-			printf("%lf ", rstar_k1[i]);
-		}
-		printf("\n");
-		*/
-
 		double beta_k = alpha_k / zeta_k * vecDot(rstar_0, r_k1) / vecDot(rstar_0, r_k);
-		printf("beta:%lf\n", beta_k);
+		// printf("beta:%lf\n", beta_k);
 		p_k = VecAddition(r_k1, vec_numtimes(beta_k, VecAddition(p_k, vec_numtimes(-zeta_k, q_k))));
 
 		// q,alpha,betaは次のループで使われない。pとxはその場で更新できる。そのため、rのみ最後に更新
 		r_k = r_k1;
 
 		counter++;
-		if (counter % 1 == 0)
-		{
-			/*
-			printf("%d:", counter);
-			for (int r = 0; r < N; r++)
-			{
-				printf(" %4lf ", x_k[r]);
-			}
-			printf("\n");
-			*/
-		}
 	}
-	printf("counter:%d\n", counter);
-
-	/*
-	for (int r = 0; r < N; r++)
-	{
-		printf(" %4lf ", x_k[r]);
-	}
-	printf("\n");
-	*/
+	printf("\"%d\", \"%.15lf\"\n", counter, vec_norm(r_k) / vec_norm(b));
 }
