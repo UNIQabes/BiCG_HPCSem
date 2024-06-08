@@ -1,9 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 #define N 1000
 #define p 0.9
-#define MAX_L 10000
+#define MAX_L 1000
 
 int main(int argc, char *argv[])
 {
@@ -83,9 +84,9 @@ int main(int argc, char *argv[])
 		}
 		if (count < 100)
 		{
-			printf("|r|/|b|:%.15lf\n", r_norm / b_norm);
+			printf("|r|/|b|:%.15lf\n", sqrt(r_norm / b_norm));
 		}
-		if (r_norm / b_norm < 1e-12)
+		if (sqrt(r_norm / b_norm) < 1e-12)
 		{
 			break;
 		}
@@ -113,7 +114,9 @@ int main(int argc, char *argv[])
 			printf("%lf ", P0[i]);
 		}
 		printf("\n");
+		*/
 
+		/*
 		printf("qstar_k:");
 		for (int i = 0; i < 5; i++)
 		{
@@ -131,7 +134,7 @@ int main(int argc, char *argv[])
 			tmp2 += P0[i] * q0[i];
 		}
 		alfa = tmp1 / tmp2;
-		// printf("alpha:%lf\n", alfa);
+		printf("alpha:%lf\n", alfa);
 		//  (終)alphak=(rstark,rk)/(pstark,qk)-----------------------
 
 		// xk1=xk+alphak*pk  rk1=rk-alphak*qk-----------------------
@@ -161,7 +164,7 @@ int main(int argc, char *argv[])
 			tmp2 += R0[i] * r0[i];
 		}
 		beta = tmp1 / tmp2;
-		// printf("beta:%lf\n", beta);
+		printf("beta:%lf\n", beta);
 		//  (終)betak=(rstar_k1,r_k1)/(rstar_k,r_k) -------------------
 
 		// pk1=rk1+betak*pk -------------------

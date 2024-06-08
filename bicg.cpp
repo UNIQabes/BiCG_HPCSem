@@ -6,7 +6,7 @@ using namespace std;
 
 #define N 1000
 #define GAMMA 0.9
-#define ITERLIMIT 10000
+#define ITERLIMIT 1000
 
 // CRS形式の行列
 struct CRSMat
@@ -89,6 +89,7 @@ vector<double> MatvecProduct(CRSMat mat, vector<double> vec)
 	vector<double> retValue(colNum, 0);
 	for (int r = 0; r < rowNum; r++)
 	{
+
 		int startCRSindex = mat.rowTop_ind[r];
 		int nextCRSindex = r == rowNum - 1 ? valNum : mat.rowTop_ind[r + 1];
 		for (int crs_ind = startCRSindex; crs_ind < nextCRSindex; crs_ind++)
@@ -210,6 +211,14 @@ int main()
 
 		vector<double> q_k = MatvecProduct(A_CRS, p_k);
 		vector<double> qstar_k = TransMatvecProduct(A_CRS, pstar_k);
+		/*
+		printf("b:");
+		for (int i = 0; i < 5; i++)
+		{
+			printf("%lf ", b[i]);
+		}
+		printf("\n");
+		*/
 
 		/*
 		printf("pstar_k:");
@@ -218,7 +227,9 @@ int main()
 			printf("%lf ", pstar_k[i]);
 		}
 		printf("\n");
+		*/
 
+		/*
 		printf("qstar_k:");
 		for (int i = 0; i < 5; i++)
 		{
@@ -230,7 +241,7 @@ int main()
 		// printVector("qk", q_k);
 
 		double alpha_k = vecDot(rstar_k, r_k) / vecDot(pstar_k, q_k);
-		// printf("alpha:%lf\n", alpha_k);
+		printf("alpha:%lf\n", alpha_k);
 
 		x_k = VecAddition(x_k, vec_numtimes(alpha_k, p_k));
 
@@ -247,7 +258,7 @@ int main()
 		*/
 
 		double beta_k = vecDot(rstar_k1, r_k1) / vecDot(rstar_k, r_k);
-		// printf("beta:%lf\n", beta_k);
+		printf("beta:%lf\n", beta_k);
 		p_k = VecAddition(r_k1, vec_numtimes(beta_k, p_k));
 		pstar_k = VecAddition(rstar_k1, vec_numtimes(beta_k, pstar_k));
 
