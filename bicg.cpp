@@ -206,11 +206,12 @@ int main()
 	int counter = 0;
 	while (counter < ITERLIMIT && vec_norm(r_k) / vec_norm(b) >= 1e-12)
 	{
-		printf("|r|/|b|:%lf\n", vec_norm(r_k) / vec_norm(b));
+		printf("|r|/|b|:%.15lf\n", vec_norm(r_k) / vec_norm(b));
 
 		vector<double> q_k = MatvecProduct(A_CRS, p_k);
 		vector<double> qstar_k = TransMatvecProduct(A_CRS, pstar_k);
 
+		/*
 		printf("pstar_k:");
 		for (int i = 0; i < 5; i++)
 		{
@@ -224,26 +225,29 @@ int main()
 			printf("%lf ", qstar_k[i]);
 		}
 		printf("\n");
+		*/
 
 		// printVector("qk", q_k);
 
 		double alpha_k = vecDot(rstar_k, r_k) / vecDot(pstar_k, q_k);
-		printf("alpha:%lf\n", alpha_k);
+		// printf("alpha:%lf\n", alpha_k);
 
 		x_k = VecAddition(x_k, vec_numtimes(alpha_k, p_k));
 
 		vector<double> r_k1 = VecAddition(r_k, vec_numtimes(-alpha_k, q_k));
 		vector<double> rstar_k1 = VecAddition(rstar_k, vec_numtimes(-alpha_k, qstar_k));
 
+		/*
 		printf("rstar_k1:");
 		for (int i = 0; i < 5; i++)
 		{
 			printf("%lf ", rstar_k1[i]);
 		}
 		printf("\n");
+		*/
 
 		double beta_k = vecDot(rstar_k1, r_k1) / vecDot(rstar_k, r_k);
-		printf("beta:%lf\n", beta_k);
+		// printf("beta:%lf\n", beta_k);
 		p_k = VecAddition(r_k1, vec_numtimes(beta_k, p_k));
 		pstar_k = VecAddition(rstar_k1, vec_numtimes(beta_k, pstar_k));
 
@@ -264,6 +268,7 @@ int main()
 			*/
 		}
 	}
+	printf("counter:%d\n", counter);
 
 	/*
 	for (int r = 0; r < N; r++)

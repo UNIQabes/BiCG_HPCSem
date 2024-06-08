@@ -3,7 +3,7 @@
 
 #define N 1000
 #define p 0.9
-#define MAX_L 2
+#define MAX_L 10000
 
 int main(int argc, char *argv[])
 {
@@ -105,6 +105,8 @@ int main(int argc, char *argv[])
 			}
 		}
 		// (終)q=Apk----------------
+
+		/*
 		printf("pstar_k:");
 		for (int i = 0; i < 5; i++)
 		{
@@ -118,6 +120,7 @@ int main(int argc, char *argv[])
 			printf("%lf ", Q0[i]);
 		}
 		printf("\n");
+		*/
 
 		// alphak=(rstark,rk)/(pstark,qk)-----------------------
 		tmp1 = 0;
@@ -128,8 +131,8 @@ int main(int argc, char *argv[])
 			tmp2 += P0[i] * q0[i];
 		}
 		alfa = tmp1 / tmp2;
-		printf("alpha:%lf\n", alfa);
-		// (終)alphak=(rstark,rk)/(pstark,qk)-----------------------
+		// printf("alpha:%lf\n", alfa);
+		//  (終)alphak=(rstark,rk)/(pstark,qk)-----------------------
 
 		// xk1=xk+alphak*pk  rk1=rk-alphak*qk-----------------------
 		for (i = 0; i < N; i++)
@@ -140,12 +143,14 @@ int main(int argc, char *argv[])
 		}
 		// (終)xk1=xk+alphak*pk  rk1=rk-alphak*qk-----------------------
 
+		/*
 		printf("rstar_k1:");
 		for (int i = 0; i < 5; i++)
 		{
 			printf("%lf ", R1[i]);
 		}
 		printf("\n");
+		*/
 
 		// betak=(rstar_k1,r_k1)/(rstar_k,r_k) -------------------
 		tmp1 = 0;
@@ -156,8 +161,8 @@ int main(int argc, char *argv[])
 			tmp2 += R0[i] * r0[i];
 		}
 		beta = tmp1 / tmp2;
-		printf("beta:%lf\n", beta);
-		// (終)betak=(rstar_k1,r_k1)/(rstar_k,r_k) -------------------
+		// printf("beta:%lf\n", beta);
+		//  (終)betak=(rstar_k1,r_k1)/(rstar_k,r_k) -------------------
 
 		// pk1=rk1+betak*pk -------------------
 		for (i = 0; i < N; i++)
