@@ -129,14 +129,31 @@ vector<double> TransMatvecProduct(CRSMat TransMat, vector<double> vec)
 	return retValue;
 }
 
-int main()
+int main(int argc, char *argv[])
 {
+	int n = N;
+	double gamma = GAMMA;
+	if (argc == 3)
+	{
+		// fprintf(stderr, "usage: $ bin/bicgstab {MatrixSize} {Gamma}\n");
+		char *cptr;
+		n = strtol(argv[1], &cptr, 10);
+		if (cptr == NULL)
+		{
+			n = N;
+		}
+		gamma = strtod(argv[2], &cptr);
+		if (cptr == NULL)
+		{
+			gamma = GAMMA;
+		}
+	}
 
 	// 行列Aの初期化
-	vector<double> val_CRS(3 * N - 2);
-	vector<int> col_ind_CRS(3 * N - 2);
-	vector<int> row_ptr_CRS(N);
-	for (int r = 0; r < N; r++)
+	vector<double> val_CRS(3 * n - 2);
+	vector<int> col_ind_CRS(3 * n - 2);
+	vector<int> row_ptr_CRS(n);
+	for (int r = 0; r < n; r++)
 	{
 		row_ptr_CRS[r] = 3 * r - 1;
 		if (r == 0)
@@ -146,7 +163,7 @@ int main()
 		for (int i = 0; i < 3; i++)
 		{
 			int c = r - 1 + i;
-			if (c < 0 || c >= N)
+			if (c < 0 || c >= n)
 			{
 				continue;
 			}
@@ -154,7 +171,7 @@ int main()
 			switch (i)
 			{
 			case 0:
-				val_CRS[counter] = GAMMA;
+				val_CRS[counter] = gamma;
 				break;
 			case 1:
 				val_CRS[counter] = 2;
@@ -193,10 +210,10 @@ int main()
 		printf("\n");
 	}
 	*/
-	CRSMat A_CRS(N, N, val_CRS, col_ind_CRS, row_ptr_CRS);
+	CRSMat A_CRS(n, n, val_CRS, col_ind_CRS, row_ptr_CRS);
 
-	vector<double> initialX(N, 0);
-	vector<double> vecFilled1(N, 1);
+	vector<double> initialX(n, 0);
+	vector<double> vecFilled1(n, 1);
 	vector<double> b = MatvecProduct(A_CRS, vecFilled1);
 
 	vector<double> x_k = initialX;
@@ -205,7 +222,7 @@ int main()
 	vector<double> p_k = r_k;
 	vector<double> pstar_k = rstar_k;
 
-	printf("\"繰り返し回数\", \"N=%d gamma=%.2lf\"\n", N, GAMMA);
+	printf("\"繰り返し回数\", \"N=%d gamma=%.2lf\"\n", n, gamma);
 
 	int counter = 0;
 	while (counter < ITERLIMIT && vec_norm(r_k) / vec_norm(b) >= 1e-12)
