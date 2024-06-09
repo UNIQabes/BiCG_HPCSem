@@ -131,6 +131,7 @@ vector<double> TransMatvecProduct(CRSMat TransMat, vector<double> vec)
 
 int main()
 {
+
 	// 行列Aの初期化
 	vector<double> val_CRS(3 * N - 2);
 	vector<int> col_ind_CRS(3 * N - 2);
@@ -203,6 +204,8 @@ int main()
 	vector<double> rstar_k = r_k;
 	vector<double> p_k = r_k;
 	vector<double> pstar_k = rstar_k;
+
+	printf("\"繰り返し回数\", \"N=%d gamma=%.2lf\"\n", N, GAMMA);
 
 	int counter = 0;
 	while (counter < ITERLIMIT && vec_norm(r_k) / vec_norm(b) >= 1e-12)
