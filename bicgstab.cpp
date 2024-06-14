@@ -226,7 +226,7 @@ int main(int argc, char *argv[])
 	int counter = 0;
 	while (counter < ITERLIMIT && vec_norm(r_k) / vec_norm(b) >= 1e-12)
 	{
-		printf("\"%d\", \"%.15lf\"\n", counter, vec_norm(r_k) / vec_norm(b));
+		printf("%d, %.15lf\n", counter, vec_norm(r_k) / vec_norm(b));
 
 		vector<double> q_k = MatvecProduct(A_CRS, p_k);
 
@@ -250,5 +250,5 @@ int main(int argc, char *argv[])
 
 		counter++;
 	}
-	printf("\"%d\", \"%.15lf\"\n", counter, vec_norm(r_k) / vec_norm(b));
+	printf("%d, %.15lf\n", counter, vec_norm(r_k) / vec_norm(b));
 }

@@ -3,11 +3,12 @@
 #include <math.h>
 
 #define N 1000
-#define p 0.9
+#define p 0.1
 #define MAX_L 1000
 
 int main(int argc, char *argv[])
 {
+	printf("\"繰り返し回数\",\"BiCG_C\"\n");
 
 	// CRS形式の行列の初期化--------------------
 	int i, j;
@@ -82,10 +83,8 @@ int main(int argc, char *argv[])
 		{
 			r_norm += r0[i] * r0[i];
 		}
-		if (count < 100)
-		{
-			printf("|r|/|b|:%.15lf\n", sqrt(r_norm / b_norm));
-		}
+		printf("%d, %.15lf\n", count - 1, sqrt(r_norm) / sqrt(b_norm));
+
 		if (sqrt(r_norm / b_norm) < 1e-12)
 		{
 			break;
@@ -134,8 +133,8 @@ int main(int argc, char *argv[])
 			tmp2 += P0[i] * q0[i];
 		}
 		alfa = tmp1 / tmp2;
-		printf("alpha:%lf\n", alfa);
-		//  (終)alphak=(rstark,rk)/(pstark,qk)-----------------------
+		// printf("alpha:%lf\n", alfa);
+		//   (終)alphak=(rstark,rk)/(pstark,qk)-----------------------
 
 		// xk1=xk+alphak*pk  rk1=rk-alphak*qk-----------------------
 		for (i = 0; i < N; i++)
@@ -164,8 +163,8 @@ int main(int argc, char *argv[])
 			tmp2 += R0[i] * r0[i];
 		}
 		beta = tmp1 / tmp2;
-		printf("beta:%lf\n", beta);
-		//  (終)betak=(rstar_k1,r_k1)/(rstar_k,r_k) -------------------
+		// printf("beta:%lf\n", beta);
+		//   (終)betak=(rstar_k1,r_k1)/(rstar_k,r_k) -------------------
 
 		// pk1=rk1+betak*pk -------------------
 		for (i = 0; i < N; i++)
@@ -184,5 +183,5 @@ int main(int argc, char *argv[])
 			P0[i] = P1[i];
 		}
 	}
-	printf("count = %d\n", count);
+	// printf("count = %d\n", count);
 }
